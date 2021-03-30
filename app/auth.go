@@ -46,7 +46,7 @@ func Paginate(r *http.Request) (int, int, int) {
 
 func JwtAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		notAuth := []string{"/", "/api/v1/user/auth/", "/api/v1/user", "/api/v1/user/register"}
+		notAuth := []string{"/", "/api/v1/user/auth", "/api/v1/user", "/api/v1/user/register"}
 		requestPath := r.URL.Path
 		response := make(map[string]interface{})
 
@@ -65,6 +65,7 @@ func JwtAuthentication(next http.Handler) http.Handler {
 		collection := models.GetDB("main").Collection("users")
 		objid, _ := primitive.ObjectIDFromHex(UserID)
 		err := collection.FindOne(context.TODO(), bson.M{"_id": objid}).Decode(&user)
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 		if err != nil {
 			response = Message(false, "Auth Error")
 			w.Header().Add("Content-Type", "application/json")

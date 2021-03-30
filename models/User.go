@@ -18,14 +18,11 @@ type Token struct {
 
 //User structure
 type User struct {
-	ID         primitive.ObjectID `json:"id" bson:"_id" `
-	Username   string             `json:"username" bson:"username"`
-	Password   string             `json:"password" bson:"password" `
-	Token      string             `json:"token" bson:"token" `
-	Occupation string             `json:"occupation" bson:"occupation"`
-	FirstName  string             `json:"firstname" bson:"firstname"`
-	LastName   string             `json:"lastname" bson:"lastname"`
-	Address    string             `json:"address" bson:"address"`
-	Zip        string             `json:"zip" bson:"zip"`
-	About      string             `json:"about" bson:"about"`
+	ID       primitive.ObjectID `json:"id" bson:"_id" `
+	Email    string             `json:"email" bson:"email"`
+	Password string             `json:"password" bson:"password" `
+	FullName string             `json:"fullname" bson:"fullname"`
+	DoB      primitive.DateTime `json:"dob" bson:"dob"`
+	Address  string             `json:"address" bson:"address"`
+	Token    string             `json:"token" bson:"token" `
 }

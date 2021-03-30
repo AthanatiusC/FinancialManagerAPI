@@ -21,12 +21,10 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 	// password := r.FormValue("password")
 	var user models.User
 	var dbuser models.User
-	// json.NewDecoder(r.Body).Decode(&user)
-	user.Username = r.FormValue("username")
-	user.Password = r.FormValue("password")
+	json.NewDecoder(r.Body).Decode(&user)
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	models.GetDB("main").Collection("users").FindOne(context.TODO(), bson.M{"username": user.Username}).Decode(&dbuser)
-	if dbuser.Username == "" {
+	models.GetDB("main").Collection("users").FindOne(context.TODO(), bson.M{"email": user.Email}).Decode(&dbuser)
+	if dbuser.Email == "" {
 		user.ID = primitive.NewObjectID()
 		user.Password = string(hashedPassword)
 		claims := jwt.MapClaims{}
@@ -37,12 +35,11 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
 
 		user.Token = tokenString
-		// fmt.Println(user.Username)
+		// fmt.Println(user.Email)
 		models.GetDB("main").Collection("users").InsertOne(context.TODO(), &user)
 		respondJSON(w, 200, "User successfully created!", user)
 		return
 	} else {
-		fmt.Println(dbuser.Username)
 		respondJSON(w, 409, "Username already exist!", user)
 		return
 	}
@@ -116,13 +113,14 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	var dbuser models.User
 	json.NewDecoder(r.Body).Decode(&user)
 	collection := models.GetDB("main").Collection("users")
-	err := collection.FindOne(context.TODO(), bson.M{"username": user.Username}).Decode(&dbuser)
+	err := collection.FindOne(context.TODO(), bson.M{"email": user.Email}).Decode(&dbuser)
 	if err != nil {
 		respondJSON(w, 404, "Error!", err)
 		return
 	}
-	fmt.Println("User ", dbuser.ID, " requesting access!")
+	// fmt.Println("User ", dbuser.ID, " requesting access!")
 	// password:= hashAndSalt()
+	// fmt.Println(dbuser.Password, user.Password)
 	ismatch := comparePasswords(dbuser.Password, []byte(user.Password))
 	if ismatch {
 		claims := jwt.MapClaims{}
