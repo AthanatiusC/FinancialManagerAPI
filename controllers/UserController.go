@@ -27,14 +27,24 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 	if dbuser.Email == "" {
 		user.ID = primitive.NewObjectID()
 		user.Password = string(hashedPassword)
+
 		claims := jwt.MapClaims{}
 		claims["authorized"] = true
+		claims["type"] = "Access"
+		claims["user_id"] = user.ID
+		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+		access := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+		access_token, _ := access.SignedString([]byte(os.Getenv("token_password")))
+
+		claims["authorized"] = true
+		claims["type"] = "Refresh"
 		claims["user_id"] = user.ID
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-		tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+		refresh := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+		refresh_token, _ := refresh.SignedString([]byte(os.Getenv("token_password")))
 
-		user.Token = tokenString
+		dbuser.AccessToken = access_token
+		dbuser.RefreshToken = refresh_token
 		// fmt.Println(user.Email)
 		models.GetDB("main").Collection("users").InsertOne(context.TODO(), &user)
 		respondJSON(w, 200, "User successfully created!", user)
@@ -125,16 +135,25 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	if ismatch {
 		claims := jwt.MapClaims{}
 		claims["authorized"] = true
+		claims["type"] = "Access"
+		claims["user_id"] = user.ID
+		claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+		access := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+		access_token, _ := access.SignedString([]byte(os.Getenv("token_password")))
+
+		claims["authorized"] = true
+		claims["type"] = "Refresh"
 		claims["user_id"] = user.ID
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-		token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-		tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+		refresh := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+		refresh_token, _ := refresh.SignedString([]byte(os.Getenv("token_password")))
 
-		dbuser.Token = tokenString
+		dbuser.AccessToken = access_token
+		dbuser.RefreshToken = refresh_token
 
 		models.GetDB("main").Collection("users").UpdateOne(context.TODO(), bson.M{"_id": dbuser.ID}, bson.D{{Key: "$set", Value: dbuser}})
 
-		respondJSON(w, http.StatusOK, "Successfully Logged In!", map[string]interface{}{"token": tokenString, "id": dbuser.ID})
+		respondJSON(w, http.StatusOK, "Successfully Logged In!", map[string]interface{}{"access_token": access_token, "refresh_token": refresh_token, "id": dbuser.ID})
 		return
 	}
 	respondJSON(w, 200, "Wrong password or email!", map[string]interface{}{})

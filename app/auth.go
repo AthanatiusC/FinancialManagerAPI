@@ -57,7 +57,8 @@ func JwtAuthentication(next http.Handler) http.Handler {
 			}
 		}
 
-		tokenHeader := r.Header.Get("auth_key")
+		// access_token := r.Header.Get("access_token")
+		refresh_token := r.Header.Get("refresh_token")
 		UserID := r.Header.Get("user_id")
 		tk := &models.Token{}
 
@@ -73,7 +74,7 @@ func JwtAuthentication(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := jwt.ParseWithClaims(tokenHeader, tk, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(refresh_token, tk, func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("token_password")), nil
 		})
 
@@ -91,7 +92,7 @@ func JwtAuthentication(next http.Handler) http.Handler {
 			return
 		}
 
-		if user.Token != tokenHeader {
+		if user.RefreshToken != refresh_token {
 			response = Message(false, "Incorrect Auth!")
 			w.Header().Add("Content-Type", "application/json")
 			Respond(w, response)

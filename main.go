@@ -40,7 +40,7 @@ func main() {
 	apiV1.Use(app.JwtAuthentication)
 
 	v1Task := apiV1.PathPrefix("/manager").Subrouter()
-	v1Task.HandleFunc("/history", controllers.GetAllTransaction).Methods("GET", "OPTIONS")         // View All
+	v1Task.HandleFunc("/history/{id}", controllers.GetAllTransaction).Methods("GET", "OPTIONS")    // View All
 	v1Task.HandleFunc("/detail/{id}", controllers.GetTransactionDetails).Methods("GET", "OPTIONS") // Get Detail
 	v1Task.HandleFunc("/insert", controllers.InsertTransaction).Methods("POST", "OPTIONS")         // Insert
 	v1Task.HandleFunc("/update", controllers.TransactionUpdate).Methods("PUT", "OPTIONS")          // Update
