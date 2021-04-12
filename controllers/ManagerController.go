@@ -20,14 +20,14 @@ func GetAllTransaction(w http.ResponseWriter, r *http.Request) {
 	transaction := models.Transaction{}
 
 	ctx := context.TODO() // Options to the database.
-	coll, err := models.GetDB("main").Collection("transactions").Find(ctx, bson.M{"uid": userid})
+	coll, err := models.GetDB("main").Collection("transactions").Find(ctx, bson.M{"userid": userid})
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	for coll.Next(ctx) {
 		coll.Decode(&transaction)
-		transaction.Time = transaction.Time
+		// transaction.Time = transaction.Time
 		transactions = append(transactions, transaction)
 		transaction = models.Transaction{}
 	}
@@ -52,9 +52,7 @@ func GetTransactionDetails(w http.ResponseWriter, r *http.Request) {
 func InsertTransaction(w http.ResponseWriter, r *http.Request) {
 	var manager models.Transaction
 	json.NewDecoder(r.Body).Decode(&manager)
-	fmt.Println(r.Header.Get("auth_key"))
 	manager.ID = primitive.NewObjectID()
-	manager.Type = ""
 	models.GetDB("main").Collection("transactions").InsertOne(context.TODO(), &manager)
 	respondJSON(w, 200, "Success Create New Task!", manager)
 }
@@ -74,7 +72,7 @@ func TransactionDelete(w http.ResponseWriter, r *http.Request) {
 func TransactionUpdate(w http.ResponseWriter, r *http.Request) {
 	var manager models.Transaction
 	json.NewDecoder(r.Body).Decode(&manager)
-	res, err := models.GetDB("main").Collection("transactions").UpdateOne(context.TODO(), bson.M{"_id": manager.ID, "uid": manager.UserID}, bson.D{{Key: "$set", Value: manager}})
+	res, err := models.GetDB("main").Collection("transactions").UpdateOne(context.TODO(), bson.M{"_id": manager.ID, "userid": manager.UserID}, bson.D{{Key: "$set", Value: manager}})
 	if err != nil {
 		respondJSON(w, 404, "Error occured", err)
 		return

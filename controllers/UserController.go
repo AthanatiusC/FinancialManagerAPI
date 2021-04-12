@@ -42,10 +42,9 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 		refresh := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
 		refresh_token, _ := refresh.SignedString([]byte(os.Getenv("token_password")))
-
-		dbuser.AccessToken = access_token
-		dbuser.RefreshToken = refresh_token
 		// fmt.Println(user.Email)
+		user.AccessToken = access_token
+		user.RefreshToken = refresh_token
 		models.GetDB("main").Collection("users").InsertOne(context.TODO(), &user)
 		respondJSON(w, 200, "User successfully created!", user)
 		return
@@ -95,8 +94,8 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 	// userid, _ := primitive.ObjectIDFromHex(mux.Vars(r)["id"])
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	user.Password = string(hashedPassword)
+	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	// user.Password = string(hashedPassword)
 
 	data := bson.D{{Key: "$set", Value: user}}
 	result, err := models.GetDB("main").Collection("users").UpdateOne(context.TODO(), bson.M{"_id": user.ID}, data)
