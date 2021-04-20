@@ -125,6 +125,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	err := collection.FindOne(context.TODO(), bson.M{"email": user.Email}).Decode(&dbuser)
 	if err != nil {
 		respondJSON(w, 404, "Error!", err)
+		fmt.Println(err)
 		return
 	}
 	// fmt.Println("User ", dbuser.ID, " requesting access!")

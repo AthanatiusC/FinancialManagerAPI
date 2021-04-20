@@ -44,6 +44,7 @@ func main() {
 	v1Task.HandleFunc("/detail/{id}", controllers.GetTransactionDetails).Methods("GET", "OPTIONS") // Get Detail
 	v1Task.HandleFunc("/insert", controllers.InsertTransaction).Methods("POST", "OPTIONS")         // Insert
 	v1Task.HandleFunc("/update", controllers.TransactionUpdate).Methods("PUT", "OPTIONS")          // Update
+	v1Task.HandleFunc("/upload", controllers.RecieveImage).Methods("POST", "OPTIONS")              // Upload
 	v1Task.HandleFunc("/delete/{id}", controllers.TransactionDelete).Methods("DELETE", "OPTIONS")  // Delete
 
 	v1User := apiV1.PathPrefix("/user").Subrouter()

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/AthanatiusC/FinanceManager/models"
@@ -78,4 +79,36 @@ func TransactionUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondJSON(w, 200, "manager Updated!", res)
+}
+
+func RecieveImage(w http.ResponseWriter, r *http.Request) {
+	r.ParseMultipartForm(10 << 20)
+	file, handler, err := r.FormFile("image")
+	// file := r.FormValue("username")
+	if err != nil {
+		fmt.Println("Error Retrieving the File")
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
+	fmt.Printf("File Size: %+v\n", handler.Size)
+	fmt.Printf("MIME Header: %+v\n", handler.Header)
+
+	// Create a temporary file within our temp-images directory that follows
+	// a particular naming pattern
+	tempFile, err := ioutil.TempFile("C:/Users/Athanatius.C/Desktop/FinanceManager/assets/asset", "upload-*.png")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer tempFile.Close()
+	fileBytes, err := ioutil.ReadAll(file)
+	tempFile.Write(fileBytes)
+	fmt.Println(tempFile.Name())
+	if err != nil {
+		fmt.Println(err)
+		respondJSON(w, 404, "Error occured", err)
+		return
+	}
+	respondJSON(w, 200, "Success upload!", tempFile.Name())
 }

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -22,7 +24,7 @@ type User struct {
 	Email        string             `json:"email" bson:"email"`
 	Password     string             `json:"password" bson:"password" `
 	FullName     string             `json:"fullname" bson:"fullname"`
-	DoB          primitive.DateTime `json:"dob" bson:"dob"`
+	DoB          time.Time          `json:"dob" bson:"dob"`
 	Address      string             `json:"address" bson:"address"`
 	AccessToken  string             `json:"access_token" bson:"access_token" `
 	RefreshToken string             `json:"refresh_token" bson:"refresh_token" `
