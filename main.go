@@ -31,7 +31,7 @@ func main() {
 			w.WriteHeader(200)
 			json.NewEncoder(w).Encode("PREFLIGHT OK")
 		})
-	APP_PORT := os.Getenv("APP_PORT")
+	APP_PORT := os.Getenv("PORT")
 	if APP_PORT == "" {
 		APP_PORT = "8088"
 	}
