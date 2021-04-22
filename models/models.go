@@ -11,11 +11,6 @@ import (
 
 var db *mongo.Database
 
-// username usera
-// password b8VEuQAyiVocR8RQ
-
-// username client
-// password H76dQCR4DZ8bhBLI
 func init() {
 
 	e := godotenv.Load() //Load .env file
@@ -23,8 +18,7 @@ func init() {
 		fmt.Print(e)
 	}
 
-	// clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	clientOptions := options.Client().ApplyURI("mongodb+srv://client:H76dQCR4DZ8bhBLI@finagecluster0.lv8aj.mongodb.net/FinanceManager?retryWrites=true&w=majority")
+	clientOptions := options.Client().ApplyURI("MONGO URI")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
